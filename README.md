@@ -166,6 +166,28 @@ With HTTP Basic Auth
 $ ./tiffy.py --proxy_http "http://user:pass@10.8.0.1:8000"
 ```
 
+## Setting up Feed
+if tiffy ran successfully at least once, the directory `tiffy/feed` will be present. In this directory are all files needed for a MISP Feed. You need to upload these files onto a file server like nginx or apache.
+
+We used nginx as an example. Upload the files into a directory on the nginx server and add a server configuration in the nginx.conf to make the directory accessible.
+
+```
+server {
+		listen 8001;  #port the nginx should listen on and provide the feed
+	    root /path/to/feed/directory;
+	    	autoindex on;        # tells nginx to automatically index the files so that they can be accessed
+	    location / {
+	    	autoindex on;        # tells nginx to automatically index the files so that they can be accessed
+	    }
+	}
+```
+
+After setting up the file server, the feed can be added to MISP. From the main menu, go to `Sync Actions`-> `List Feeds`. In the menu on the left, select `Add Feed`. 
+
+
+Set the feed to enabled and activate lookup and caching. Name the feed and the provider and set input source to Network. In the url field, add the url to the feed directory on your file server.
+
+After setting up the feed and enabling it, the events will be imported into MISP. To manually start an import, click the download icon on the TIE feed in the feed list. To see all events and import single events contained in the feed, click on the magnifying glass icon.
 # License
 
 This software is released under a BSD 3-Clause license.
