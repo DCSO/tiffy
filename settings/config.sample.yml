@@ -1,22 +1,18 @@
 base:
   tie_apiurl: "https://foo.bar/api/"
   tie_apikey: "12345683127481209123789"
-  base_severity: 3
-  base_confidence: 60
 
 organisation:
   name: "ACME"
   uuid: "5804adw2-12fe-1234-34av-07lk82aw012a"
 
 events:
-  base_threat_level: "3"
-  published: "False"
-  base_confidence: "80"
-  base_severity: "2"
-
-
+  base_threat_level: 3
+  published: False
+  base_confidence: 60
+  base_severity: 1
 
 attributes:
-  to_ids: "False"
-  tagging: "False"
+  to_ids: False
+  tagging: False
 

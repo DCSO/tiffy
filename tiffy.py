@@ -100,12 +100,28 @@ def init(category, actor, family, source, first_seen, last_seen, event_tags, out
     # Signal handler for CTRL+C
     signal_module.signal(signal_module.SIGINT, signal_handler)
 
+    if 'TIFFY_PARAM_LOG_DISABLE_CONSOLE' in os.environ:
+        disable_console_log = bool(os.environ.get('TIFFY_PARAM_LOG_DISABLE_CONSOLE'))
+
+    if 'TIFFY_PARAM_LOG_DISABLE_FILE' in os.environ:
+        disable_file_log = bool(os.environ.get('TIFFY_PARAM_LOG_DISABLE_FILE'))
+
+    if 'TIFFY_PARAM_TIE_DISABLE_DEFAULT_FILTER' in os.environ:
+        no_filter = bool(os.environ.get('TIFFY_PARAM_TIE_DISABLE_DEFAULT_FILTER'))
+
+    if 'TIFFY_PARAM_OUTPUT_FORMAT' in os.environ:
+        output_format = os.environ.get('TIFFY_PARAM_OUTPUT_FORMAT')
+
+    if 'TIFFY_PARAM_TIE_MISP_EVENT_TAGS' in os.environ:
+        event_tags = os.environ.get('TIFFY_PARAM_TIE_MISP_EVENT_TAGS')
     try:
         event_tags = json.loads(event_tags)
     except JSONDecodeError:
         raise_error_critical('event tags are not valid JSON')
 
     # check loglvl
+    if 'TIFFY_PARAM_LOG_LEVEL' in os.environ:
+        loglvl = int(os.environ.get('TIFFY_PARAM_LOG_LEVEL'))
     if isinstance(loglvl, int):
         if loglvl < 0 or loglvl > 50:
             click.echo(
@@ -118,6 +134,11 @@ def init(category, actor, family, source, first_seen, last_seen, event_tags, out
         loglvl = 20
     TIELoader.init_logger(sys.path[0], "tiffy.py", loglvl, disable_console_log, disable_file_log)
     try:
+
+        if 'TIFFY_PARAM_TIE_SEEN_FIRST' in os.environ:
+            first_seen = os.environ.get('TIFFY_PARAM_TIE_SEEN_FIRST')
+        if 'TIFFY_PARAM_TIE_SEEN_LAST' in os.environ:
+            last_seen = os.environ.get('TIFFY_PARAM_TIE_SEEN_LAST')
 
         # Check date arguments
         if first_seen is not None:
@@ -138,6 +159,15 @@ def init(category, actor, family, source, first_seen, last_seen, event_tags, out
                     'Last Seen Date could not be converted. Please use the following format YYYY-MM-DD')
 
         # Check confidence
+
+        if 'TIFFY_PARAM_TIE_CONFIDENCE_MIN' in os.environ:
+            min_confidence = int(os.environ.get('TIFFY_PARAM_TIE_CONFIDENCE_MIN'))
+        if 'TIFFY_PARAM_TIE_CONFIDENCE_MAX' in os.environ:
+            max_confidence = int(os.environ.get('TIFFY_PARAM_TIE_CONFIDENCE_MAX'))
+        if 'TIFFY_PARAM_TIE_SEVERITY_MIN' in os.environ:
+            min_severity = int(os.environ.get('TIFFY_PARAM_TIE_SEVERITY_MIN'))
+        if 'TIFFY_PARAM_TIE_SEVERITY_MAX' in os.environ:
+            max_severity = int(os.environ.get('TIFFY_PARAM_TIE_SEVERITY_MAX'))
 
         if max_confidence is not None:
             if isinstance(max_confidence, int):
@@ -182,6 +212,15 @@ def init(category, actor, family, source, first_seen, last_seen, event_tags, out
                 'HTTPS_PROXY'):
             proxy_tie_addr = checkProxyUrls(proxy_http, proxy_https, True)
 
+        if 'TIFFY_PARAM_TIE_ACTOR' in os.environ:
+            actor = os.environ.get('TIFFY_PARAM_TIE_ACTOR')
+        if 'TIFFY_PARAM_TIE_CATEGORY' in os.environ:
+            category = os.environ.get('TIFFY_PARAM_TIE_CATEGORY')
+        if 'TIFFY_PARAM_TIE_FAMILY' in os.environ:
+            family = os.environ.get('TIFFY_PARAM_TIE_FAMILY')
+        if 'TIFFY_PARAM_TIE_SOURCE' in os.environ:
+            source = os.environ.get('TIFFY_PARAM_TIE_SOURCE')
+
         # check family, source, category, actor parameters
         pattern = "^[a-zA-Z0-9 /-]+(?:,[a-zA-Z0-9 /-]+)*$"
         if actor:
@@ -209,6 +248,29 @@ def init(category, actor, family, source, first_seen, last_seen, event_tags, out
 
             logging.info("Powering up flux capacitor. Starting up tiffy.")
             logging.info("#### Start new TIE-Query ####")
+            logging.debug("Params:")
+            logging.debug("output_format: " + str(output_format))
+            logging.debug("event_tags: " + str(event_tags))
+            logging.debug("category: " + str(category))
+            logging.debug("actor: " + str(actor))
+            logging.debug("family: " + str(family))
+            logging.debug("source: " + str(source))
+            logging.debug("given_first_seen_date: " + str(given_first_seen_date))
+            logging.debug("given_last_seen_date: " + str(given_last_seen_date))
+            logging.debug("min_confidence: " + str(min_confidence))
+            logging.debug("min_severity: " + str(min_severity))
+            logging.debug("max_confidence: " + str(max_confidence))
+            logging.debug("max_severity: " + str(max_severity))
+            logging.debug("conf.event_base_thread_level: " + str(conf.event_base_thread_level))
+            logging.debug("conf.base_severity: " + str(conf.base_severity))
+            logging.debug("conf.event_published: " + str(conf.event_published))
+            logging.debug("conf.tie_api_key: " + str(conf.tie_api_key))
+            logging.debug("conf.tie_api_url: " + str(conf.tie_api_url))
+            logging.debug("conf.attr_tagging: " + str(conf.attr_tagging))
+            logging.debug("conf.attr_to_ids: " + str(conf.attr_to_ids))
+            logging.debug("conf.base_confidence: " + str(conf.base_confidence))
+            logging.debug("conf.org_uuid: " + str(conf.org_uuid))
+            logging.debug("conf.org_name: " + str(conf.org_name))
 
             TIELoader.start(output_format, conf, event_tags, category, actor, family, source, given_first_seen_date,
                             given_last_seen_date, min_confidence, min_severity, max_confidence, max_severity,
