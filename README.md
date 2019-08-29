@@ -1,6 +1,7 @@
 # tiffy
 
-Generate Feeds from TIE Content
+## About
+Generate Feeds from TIE Content.
 
 ## Requirements
 ### Base
@@ -53,7 +54,7 @@ $ ./tiffy.py --last-seen 2019-07-13
 $ ./tiffy.py --first-seen 2019-03-13 --last-seen 2019-07-13
 ```
 
-### Using the source, actor, category or family parameter
+### Using the Source, Actor, Category or Family parameter
 Sometimes it's necessary to get all IOC's from a specific attacker group or tool family. In most cases these are known 
 under more than one name. Because of this, tiffy offers the capability to search for these values.
 
@@ -87,7 +88,7 @@ $ ./tiffy.py --source example
 $ ./tiffy.py --source example1,example2
 ```
 
-## Using severity and confidence parameters
+## Using Severity and Confidence Parameters
 
 tiffy is also able to filter ioc's based on min or max severity/confidence. If you pass only a min-value, tiffy
 will search all values at or above the value. If you pass only a max-value, ioc's at or below the value will be returned.
@@ -111,7 +112,7 @@ $ ./tiffy.py --max-confidence 4                        #gets all ioc's up to and
 $ ./tiffy.py --min-confidence 2 --max-confidence 4     #gets all ioc's from confidence 2 to confidence 4
 ```
 
-## Setting default tags for the MISP-Event
+## Setting Default Tags for the MISP Event
 
 You can pass tags for the newly created event. Tags are passed as MISP-compatible JSON Strings and will be added 
 to the base event. Double quotes need to be escaped. If no tags are passed `TLP:AMBER` will be used as default.
@@ -151,7 +152,7 @@ $ ./tiffy.py --disable_console_log
 $ ./tiffy.py --disable_file_log
 ```
 
-## Using a proxy
+## Using a Proxy
 tiffy offers various ways for the use of a proxy. First, if the system variable `HTTP_PROXY` or `HTTPS_PROXY` is 
 set, tiffy will automatically use the given information's.
 
@@ -172,7 +173,7 @@ if tiffy ran successfully at least once, the directory `tiffy/feed` will be pres
 
 We used nginx as an example. Upload the files into a directory on the nginx server and add a server configuration in the nginx.conf to make the directory accessible.
 
-```nginx
+```
 server {
 		listen 8001;  #port the nginx should listen on and provide the feed
 	    root /path/to/feed/directory;
@@ -193,7 +194,7 @@ After setting up the feed and enabling it, the events will be imported into MISP
 
 ![alt text](https://raw.githubusercontent.com/DCSO/tiffy/master/images/options.png "Options")
 
-# License
+## License
 
 This software is released under a BSD 3-Clause license.
 Please have a look at the LICENSE file included in the repository.
