@@ -2,12 +2,12 @@
 
 Generate Feeds from TIE Content
 
-# Requirements
-## Base
+## Requirements
+### Base
 - Python 3.7
 - TIE API Key http://tie.dcso.de  
 
-## Packages
+### Packages
 - PyTest https://pytest.org
 - pytest-testdox https://github.com/renanivo/pytest-testdox
 - Requests http://python-requests.org
@@ -16,7 +16,7 @@ Generate Feeds from TIE Content
 - PyMISP https://github.com/MISP/PyMISP
 - python-dateutil https://dateutil.readthedocs.io
 
-# Install
+## Install
 ```bash
 $ git clone https://github.com/DCSO/tiffy.git
 $ pip3 install -r requirements.txt
@@ -33,7 +33,7 @@ $ cp settings/config.sample.yml settings/config.yml
 $ vim settings/config.yml
 ```
 
-# HowTo
+## HowTo
 To start the generator just run:
 ```bash
 $ ./tiffy.py
@@ -44,6 +44,7 @@ If no first seen date is set, the generator will always use the current system d
 
 To process attributes from or until a specific date you can use the `--first-seen YYYY-MM-DD` or 
 `--last-seen YYYY-MM-DD` option. You can also combine both parameters.
+
 ```bash
 $ ./tiffy.py --first-seen 2019-03-13
 
@@ -52,7 +53,7 @@ $ ./tiffy.py --last-seen 2019-07-13
 $ ./tiffy.py --first-seen 2019-03-13 --last-seen 2019-07-13
 ```
 
-## Using the source, actor, category or family parameter
+### Using the source, actor, category or family parameter
 Sometimes it's necessary to get all IOC's from a specific attacker group or tool family. In most cases these are known 
 under more than one name. Because of this, tiffy offers the capability to search for these values.
 
@@ -86,7 +87,7 @@ $ ./tiffy.py --source example
 $ ./tiffy.py --source example1,example2
 ```
 
-##Using severity and confidence parameters
+## Using severity and confidence parameters
 
 tiffy is also able to filter ioc's based on min or max severity/confidence. If you pass only a min-value, tiffy
 will search all values at or above the value. If you pass only a max-value, ioc's at or below the value will be returned.
@@ -113,7 +114,7 @@ $ ./tiffy.py --min-confidence 2 --max-confidence 4     #gets all ioc's from conf
 ## Setting default tags for the MISP-Event
 
 You can pass tags for the newly created event. Tags are passed as MISP-compatible JSON Strings and will be added 
-to the base event. Double quotes need to be escaped. If no tags are passed tlp.amber will be used as default.
+to the base event. Double quotes need to be escaped. If no tags are passed `TLP:AMBER` will be used as default.
 
 ```bash
 $ ./tiffy.py --event-tags {\"name\":\"tlp:amber\"}
@@ -125,7 +126,7 @@ You can choose the output format of the feed. Currently only MISP-JSON is suppor
 
 ```bash
 $ ./tiffy.py --output-format MISP
-````
+```
 
 ## Disable the Default Filter
 
@@ -133,7 +134,7 @@ tiffy will use the default TIE filter. You can disable this behaviour by passing
 
 ```bash
 $ ./tiffy.py --no-filter
-````
+```
 
 ## Additional Parameters
 
@@ -148,7 +149,7 @@ $ ./tiffy.py --loglvl 10
 $ ./tiffy.py --disable_console_log
 
 $ ./tiffy.py --disable_file_log
-````
+```
 
 ## Using a proxy
 tiffy offers various ways for the use of a proxy. First, if the system variable `HTTP_PROXY` or `HTTPS_PROXY` is 
@@ -171,7 +172,7 @@ if tiffy ran successfully at least once, the directory `tiffy/feed` will be pres
 
 We used nginx as an example. Upload the files into a directory on the nginx server and add a server configuration in the nginx.conf to make the directory accessible.
 
-```
+```nginx
 server {
 		listen 8001;  #port the nginx should listen on and provide the feed
 	    root /path/to/feed/directory;
