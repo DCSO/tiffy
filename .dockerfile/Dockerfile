@@ -10,14 +10,15 @@ RUN set -eu \
     ;rm requirements.txt  \
     ;chown -R nobody:nobody /tiffy \
     ;
-#################################
-# FROM gcr.io/distroless/python3
-# COPY --from=build /tiffy /tiffy
+
+
+
+FROM alpine
+COPY --from=build /tiffy /tiffy
+ENV PATH=/tiffy/venv/bin:$PATH
 USER nobody
 WORKDIR /tiffy
-ENTRYPOINT [ "/tiffy/venv/bin/python", "/tiffy/tiffy.py" ]
-
-#################################
+ENTRYPOINT [ "python", "tiffy.py" ]
 
 # Build Arguments
     ARG BUILD_DATE
@@ -25,7 +26,6 @@ ENTRYPOINT [ "/tiffy/venv/bin/python", "/tiffy/tiffy.py" ]
     ARG VCS_REF
     ARG NAME="tiffy"
     ARG DESCRIPTION="This docker container is an feed generator from DCSO TIE to MISP."
-    #ARG DOCUMENTATION="https://github.com/DCSO/tiffy"
     ARG AUTHOR="DCSO TI Team <ti-support@dcso.de>"
     ARG LICENSE="BSD-3-Clause"
 
