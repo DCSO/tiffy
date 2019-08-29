@@ -1,6 +1,7 @@
-*.md
-images
 .*
-LICENSE
+.*/
+*.md
 docker
+images
 Makefile
+LICENSE
