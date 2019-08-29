@@ -5,7 +5,9 @@ RUN set -eu \
 WORKDIR /tiffy
 COPY . .
 RUN set -eu \
+    ; rmdir /tiffy/.dockerfile \
     ;/tiffy/venv/bin/pip3 install -r requirements.txt --no-cache-dir \
+    ;rm requirements.txt  \
     ;chown -R nobody:nobody /tiffy \
     ;
 #################################
