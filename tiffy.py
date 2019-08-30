@@ -63,8 +63,8 @@ def signal_handler(signal_name, frame):
               help='sets the output format for the feed.')
 @click.option('--no-filter', is_flag=True,
               help='If set, no filter will be used for the request to TIE. Otherwise, the default filter will be used.')
-@click.option('--loglvl', default=20, help='Sets the log level. Default is 20.\n Params are: 0 - NOTSET / 10 - DEBUG / '
-                                           '20 - INFO / 30 - WARNING / 40 - ERROR / 50 - CRITICAL')
+@click.option('--loglvl', default='INFO', help='Sets the log level. Default is INFO.\n Params are: DEBUG / '
+                                               'INFO / WARNING / ERROR / CRITICAL')
 @click.option('--disable_console_log', is_flag=True, help='If used, the convert will not generate output in the '
                                                           'console')
 @click.option('--disable_file_log', is_flag=True, help='If used, the converter will not generate a file output')
@@ -100,19 +100,19 @@ def init(category, actor, family, source, first_seen, last_seen, event_tags, out
     # Signal handler for CTRL+C
     signal_module.signal(signal_module.SIGINT, signal_handler)
 
-    if 'TIFFY_PARAM_LOG_DISABLE_CONSOLE' in os.environ:
+    if disable_console_log is None and 'TIFFY_PARAM_LOG_DISABLE_CONSOLE' in os.environ:
         disable_console_log = bool(os.environ.get('TIFFY_PARAM_LOG_DISABLE_CONSOLE'))
 
-    if 'TIFFY_PARAM_LOG_DISABLE_FILE' in os.environ:
+    if disable_file_log is None and 'TIFFY_PARAM_LOG_DISABLE_FILE' in os.environ:
         disable_file_log = bool(os.environ.get('TIFFY_PARAM_LOG_DISABLE_FILE'))
 
-    if 'TIFFY_PARAM_TIE_DISABLE_DEFAULT_FILTER' in os.environ:
+    if no_filter is None and 'TIFFY_PARAM_TIE_DISABLE_DEFAULT_FILTER' in os.environ:
         no_filter = bool(os.environ.get('TIFFY_PARAM_TIE_DISABLE_DEFAULT_FILTER'))
 
-    if 'TIFFY_PARAM_OUTPUT_FORMAT' in os.environ:
+    if output_format is None and 'TIFFY_PARAM_OUTPUT_FORMAT' in os.environ:
         output_format = os.environ.get('TIFFY_PARAM_OUTPUT_FORMAT')
 
-    if 'TIFFY_PARAM_TIE_MISP_EVENT_TAGS' in os.environ:
+    if event_tags is None and 'TIFFY_PARAM_TIE_MISP_EVENT_TAGS' in os.environ:
         event_tags = os.environ.get('TIFFY_PARAM_TIE_MISP_EVENT_TAGS')
     try:
         event_tags = json.loads(event_tags)
@@ -120,24 +120,24 @@ def init(category, actor, family, source, first_seen, last_seen, event_tags, out
         raise_error_critical('event tags are not valid JSON')
 
     # check loglvl
-    if 'TIFFY_PARAM_LOG_LEVEL' in os.environ:
-        loglvl = int(os.environ.get('TIFFY_PARAM_LOG_LEVEL'))
-    if isinstance(loglvl, int):
-        if loglvl < 0 or loglvl > 50:
+    if loglvl is 'INFO' and 'TIFFY_PARAM_LOG_LEVEL' in os.environ:
+        loglvl = str(os.environ.get('TIFFY_PARAM_LOG_LEVEL'))
+    if isinstance(loglvl, str):
+        if loglvl not in ['DEBUG', 'INFO', 'WARNING','ERROR', 'CRITICAL']:
             click.echo(
-                'loglvl must be equal or between 0 and 50. Type \'python tiffy.py --help\' for'
-                ' more information\'s.\nSet default value: 20')
-            loglvl = 20
+                'loglvl must be one of DEBUG, INFO, WARNING, ERROR or CRITICAL. Type \'python tiffy.py --help\' for'
+                ' more information\'s.\nSet default value: INFO')
+            loglvl = 'INFO'
     else:
         click.echo('loglvl must be an unsigned integer value equal or between 0 and 50. Type \'python tiffy.py '
                    '--help\' for more information\'s.\nSet default value: 20')
-        loglvl = 20
+        loglvl = 'INFO'
     TIELoader.init_logger(sys.path[0], "tiffy.py", loglvl, disable_console_log, disable_file_log)
     try:
 
-        if 'TIFFY_PARAM_TIE_SEEN_FIRST' in os.environ:
+        if first_seen is None and 'TIFFY_PARAM_TIE_SEEN_FIRST' in os.environ:
             first_seen = os.environ.get('TIFFY_PARAM_TIE_SEEN_FIRST')
-        if 'TIFFY_PARAM_TIE_SEEN_LAST' in os.environ:
+        if last_seen is None and 'TIFFY_PARAM_TIE_SEEN_LAST' in os.environ:
             last_seen = os.environ.get('TIFFY_PARAM_TIE_SEEN_LAST')
 
         # Check date arguments
@@ -160,13 +160,13 @@ def init(category, actor, family, source, first_seen, last_seen, event_tags, out
 
         # Check confidence
 
-        if 'TIFFY_PARAM_TIE_CONFIDENCE_MIN' in os.environ:
+        if min_confidence is None and 'TIFFY_PARAM_TIE_CONFIDENCE_MIN' in os.environ:
             min_confidence = int(os.environ.get('TIFFY_PARAM_TIE_CONFIDENCE_MIN'))
-        if 'TIFFY_PARAM_TIE_CONFIDENCE_MAX' in os.environ:
+        if max_confidence is None and 'TIFFY_PARAM_TIE_CONFIDENCE_MAX' in os.environ:
             max_confidence = int(os.environ.get('TIFFY_PARAM_TIE_CONFIDENCE_MAX'))
-        if 'TIFFY_PARAM_TIE_SEVERITY_MIN' in os.environ:
+        if min_severity is None and 'TIFFY_PARAM_TIE_SEVERITY_MIN' in os.environ:
             min_severity = int(os.environ.get('TIFFY_PARAM_TIE_SEVERITY_MIN'))
-        if 'TIFFY_PARAM_TIE_SEVERITY_MAX' in os.environ:
+        if max_severity is None and 'TIFFY_PARAM_TIE_SEVERITY_MAX' in os.environ:
             max_severity = int(os.environ.get('TIFFY_PARAM_TIE_SEVERITY_MAX'))
 
         if max_confidence is not None:
@@ -212,13 +212,13 @@ def init(category, actor, family, source, first_seen, last_seen, event_tags, out
                 'HTTPS_PROXY'):
             proxy_tie_addr = checkProxyUrls(proxy_http, proxy_https, True)
 
-        if 'TIFFY_PARAM_TIE_ACTOR' in os.environ:
+        if actor is None and 'TIFFY_PARAM_TIE_ACTOR' in os.environ:
             actor = os.environ.get('TIFFY_PARAM_TIE_ACTOR')
-        if 'TIFFY_PARAM_TIE_CATEGORY' in os.environ:
+        if category is None and 'TIFFY_PARAM_TIE_CATEGORY' in os.environ:
             category = os.environ.get('TIFFY_PARAM_TIE_CATEGORY')
-        if 'TIFFY_PARAM_TIE_FAMILY' in os.environ:
+        if family is None and 'TIFFY_PARAM_TIE_FAMILY' in os.environ:
             family = os.environ.get('TIFFY_PARAM_TIE_FAMILY')
-        if 'TIFFY_PARAM_TIE_SOURCE' in os.environ:
+        if source is None and 'TIFFY_PARAM_TIE_SOURCE' in os.environ:
             source = os.environ.get('TIFFY_PARAM_TIE_SOURCE')
 
         # check family, source, category, actor parameters
@@ -266,7 +266,6 @@ def init(category, actor, family, source, first_seen, last_seen, event_tags, out
             logging.debug("conf.event_published: " + str(conf.event_published))
             logging.debug("conf.tie_api_key: " + str(conf.tie_api_key))
             logging.debug("conf.tie_api_url: " + str(conf.tie_api_url))
-            logging.debug("conf.attr_tagging: " + str(conf.attr_tagging))
             logging.debug("conf.attr_to_ids: " + str(conf.attr_to_ids))
             logging.debug("conf.base_confidence: " + str(conf.base_confidence))
             logging.debug("conf.org_uuid: " + str(conf.org_uuid))

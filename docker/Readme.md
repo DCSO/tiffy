@@ -36,7 +36,6 @@ Example file is in ./docker/docker-compose.yml
 | TIFFY_CONF_MISP_EVENTS_BASE_SEVERITY     | "2"                  |                          | IoC will get this severity if it is added                         |
 | TIFFY_CONF_MISP_EVENTS_PUBLISHED         | false                |                          | IoC will get published in MISP                                    |
 | TIFFY_CONF_MISP_ATTRIBUTES_TO_IDS        | false                |                          | Set IDS flag for this IoC                                         |
-| TIFFY_CONF_MISP_ATTRIBUTES_TAGGING       | false                |                          | Tag IoCs                                                          |
 | TIFFY_PARAM_TIE_SEEN_FIRST               |                      | "YYYY-MM-DD"             | Download only IoC which are first seen at ... and newer           |
 | TIFFY_PARAM_TIE_SEEN_LAST                |                      | "YYYY-MM-DD"             | Download only IoC which are last seen at ... and older            |
 | TIFFY_PARAM_TIE_ACTOR                    |                      | "example1,example2"      | Download only IoC with this actor                                 |
