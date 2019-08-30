@@ -16,3 +16,15 @@ attributes:
   to_ids: False
   tagging: False
 
+
+  ######
+
+TIE:
+  apiurl
+  apikey
+
+MISP:
+  events:
+  orga:
+  attributes:
+  
