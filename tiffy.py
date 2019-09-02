@@ -51,44 +51,52 @@ def signal_handler(signal_name, frame):
 
 # INIT tiffy --------------------------------------------------------------
 @click.command()
-@click.option('--category', help='list of categories separated by comma to filter for')
-@click.option('--actor', help='list of actors separated by comma to filter for')
-@click.option('--family', help='list of actors separated by comma to filter for')
-@click.option('--source', help='list of source pseudonyms separated by comma to filter for')
-@click.option('--first-seen')
-@click.option('--last-seen')
+@click.option('--category', help='list of categories separated by comma to filter for',
+              envvar='TIFFY_PARAM_TIE_CATEGORY')
+@click.option('--actor', help='list of actors separated by comma to filter for', envvar='TIFFY_PARAM_TIE_ACTOR')
+@click.option('--family', help='list of actors separated by comma to filter for', envvar='TIFFY_PARAM_TIE_FAMILY')
+@click.option('--source', help='list of source pseudonyms separated by comma to filter for',
+              envvar='TIFFY_PARAM_TIE_SOURCE')
+@click.option('--first-seen', envvar='TIFFY_PARAM_TIE_SEEN_FIRST')
+@click.option('--last-seen', envvar='TIFFY_PARAM_TIE_SEEN_LAST')
 @click.option('--event-tags', help='event base tags as MISP conform JSON object String',
-              default='{"name": "tlp:amber"}')
+              default='{"name": "tlp:amber"}', envvar='TIFFY_PARAM_TIE_MISP_EVENT_TAGS')
 @click.option('--output-format', type=click.Choice(['MISP']), default='MISP',
-              help='sets the output format for the feed.')
+              help='sets the output format for the feed.', envvar='TIFFY_PARAM_OUTPUT_FORMAT')
 @click.option('--no-filter', is_flag=True,
-              help='If set, no filter will be used for the request to TIE. Otherwise, the default filter will be used.')
+              help='If set, no filter will be used for the request to TIE. Otherwise, the default filter will be used.',
+              envvar='TIFFY_PARAM_TIE_DISABLE_DEFAULT_FILTER')
 @click.option('--loglvl', default='INFO', help='Sets the log level. Default is INFO.\n Params are: DEBUG / '
-                                               'INFO / WARNING / ERROR / CRITICAL')
+                                               'INFO / WARNING / ERROR / CRITICAL', envvar='TIFFY_PARAM_LOG_LEVEL')
 @click.option('--disable_console_log', is_flag=True, help='If used, the convert will not generate output in the '
-                                                          'console')
-@click.option('--disable_file_log', is_flag=True, help='If used, the converter will not generate a file output')
+                                                          'console', envvar='TIFFY_PARAM_LOG_DISABLE_CONSOLE')
+@click.option('--disable_file_log', is_flag=True, help='If used, the converter will not generate a file output',
+              envvar='TIFFY_PARAM_LOG_DISABLE_FILE')
+@click.option('--log_file_path', help='path to the location where the log file should be stored',
+              envvar='TIFFY_PARAM_LOG_FILE')
 @click.option('--min-severity', type=int, help='Events with a severity value lower than the given value will not be '
                                                'fetched. If used, the generator will ignore the severity value defined '
-                                               'in the config file. The severity value can be equal or between 0 and 5.')
+                                               'in the config file. The severity value can be equal or between 0 and 5.',
+              envvar='TIFFY_PARAM_TIE_SEVERITY_MIN')
 @click.option('--min-confidence', type=int,
               help='Events with a confidence value lower than the given value will not be '
                    'fetched. If used, the generator will ignore the severity value defined '
                    'in the config file. The confidence value can be equal or between 0 and '
-                   '100')
+                   '100', envvar='TIFFY_PARAM_TIE_CONFIDENCE_MIN')
 @click.option('--max-severity', type=int, help='Events with a severity value higher than the given value will not be '
                                                'fetched. If used, the generator will ignore the severity value defined '
-                                               'in the config file. The severity value can be equal or between 0 and 5.')
+                                               'in the config file. The severity value can be equal or between 0 and 5.',
+              envvar='TIFFY_PARAM_TIE_SEVERITY_MAX')
 @click.option('--max-confidence', type=int,
               help='Events with a confidence value higher than the given value will not be '
                    'fetched. If used, the generator will ignore the severity value defined '
                    'in the config file. The confidence value can be equal or between 0 and '
-                   '100')
+                   '100', envvar='TIFFY_PARAM_TIE_CONFIDENCE_MAX')
 @click.option('--proxy_http', type=str, help='Sets the address for a http based proxy e.g. http://10.8.0.1:8000')
 @click.option('--proxy_https', type=str, help='Sets the address for a https based proxy e.g. https://10.8.0.1:8000')
 def init(category, actor, family, source, first_seen, last_seen, event_tags, output_format, no_filter, loglvl,
-         disable_console_log, disable_file_log, min_severity, min_confidence, max_severity, max_confidence,
-         proxy_http, proxy_https):
+         disable_console_log, disable_file_log, log_file_path, min_severity, min_confidence, max_severity,
+         max_confidence, proxy_http, proxy_https):
     """
     Starting the converter
     """
@@ -99,31 +107,14 @@ def init(category, actor, family, source, first_seen, last_seen, event_tags, out
 
     # Signal handler for CTRL+C
     signal_module.signal(signal_module.SIGINT, signal_handler)
-
-    if disable_console_log is None and 'TIFFY_PARAM_LOG_DISABLE_CONSOLE' in os.environ:
-        disable_console_log = bool(os.environ.get('TIFFY_PARAM_LOG_DISABLE_CONSOLE'))
-
-    if disable_file_log is None and 'TIFFY_PARAM_LOG_DISABLE_FILE' in os.environ:
-        disable_file_log = bool(os.environ.get('TIFFY_PARAM_LOG_DISABLE_FILE'))
-
-    if no_filter is None and 'TIFFY_PARAM_TIE_DISABLE_DEFAULT_FILTER' in os.environ:
-        no_filter = bool(os.environ.get('TIFFY_PARAM_TIE_DISABLE_DEFAULT_FILTER'))
-
-    if output_format is None and 'TIFFY_PARAM_OUTPUT_FORMAT' in os.environ:
-        output_format = os.environ.get('TIFFY_PARAM_OUTPUT_FORMAT')
-
-    if event_tags is None and 'TIFFY_PARAM_TIE_MISP_EVENT_TAGS' in os.environ:
-        event_tags = os.environ.get('TIFFY_PARAM_TIE_MISP_EVENT_TAGS')
     try:
         event_tags = json.loads(event_tags)
     except JSONDecodeError:
         raise_error_critical('event tags are not valid JSON')
 
     # check loglvl
-    if loglvl is 'INFO' and 'TIFFY_PARAM_LOG_LEVEL' in os.environ:
-        loglvl = str(os.environ.get('TIFFY_PARAM_LOG_LEVEL'))
     if isinstance(loglvl, str):
-        if loglvl not in ['DEBUG', 'INFO', 'WARNING','ERROR', 'CRITICAL']:
+        if loglvl not in ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']:
             click.echo(
                 'loglvl must be one of DEBUG, INFO, WARNING, ERROR or CRITICAL. Type \'python tiffy.py --help\' for'
                 ' more information\'s.\nSet default value: INFO')
@@ -132,13 +123,10 @@ def init(category, actor, family, source, first_seen, last_seen, event_tags, out
         click.echo('loglvl must be an unsigned integer value equal or between 0 and 50. Type \'python tiffy.py '
                    '--help\' for more information\'s.\nSet default value: 20')
         loglvl = 'INFO'
-    TIELoader.init_logger(sys.path[0], "tiffy.py", loglvl, disable_console_log, disable_file_log)
+    if log_file_path is None:
+        log_file_path = sys.path[0]
+    TIELoader.init_logger(log_file_path, "tiffy.py", loglvl, disable_console_log, disable_file_log)
     try:
-
-        if first_seen is None and 'TIFFY_PARAM_TIE_SEEN_FIRST' in os.environ:
-            first_seen = os.environ.get('TIFFY_PARAM_TIE_SEEN_FIRST')
-        if last_seen is None and 'TIFFY_PARAM_TIE_SEEN_LAST' in os.environ:
-            last_seen = os.environ.get('TIFFY_PARAM_TIE_SEEN_LAST')
 
         # Check date arguments
         if first_seen is not None:
@@ -159,15 +147,6 @@ def init(category, actor, family, source, first_seen, last_seen, event_tags, out
                     'Last Seen Date could not be converted. Please use the following format YYYY-MM-DD')
 
         # Check confidence
-
-        if min_confidence is None and 'TIFFY_PARAM_TIE_CONFIDENCE_MIN' in os.environ:
-            min_confidence = int(os.environ.get('TIFFY_PARAM_TIE_CONFIDENCE_MIN'))
-        if max_confidence is None and 'TIFFY_PARAM_TIE_CONFIDENCE_MAX' in os.environ:
-            max_confidence = int(os.environ.get('TIFFY_PARAM_TIE_CONFIDENCE_MAX'))
-        if min_severity is None and 'TIFFY_PARAM_TIE_SEVERITY_MIN' in os.environ:
-            min_severity = int(os.environ.get('TIFFY_PARAM_TIE_SEVERITY_MIN'))
-        if max_severity is None and 'TIFFY_PARAM_TIE_SEVERITY_MAX' in os.environ:
-            max_severity = int(os.environ.get('TIFFY_PARAM_TIE_SEVERITY_MAX'))
 
         if max_confidence is not None:
             if isinstance(max_confidence, int):
@@ -211,15 +190,6 @@ def init(category, actor, family, source, first_seen, last_seen, event_tags, out
         if proxy_http is not None or os.environ.get('HTTP_PROXY') or proxy_https is not None or os.environ.get(
                 'HTTPS_PROXY'):
             proxy_tie_addr = checkProxyUrls(proxy_http, proxy_https, True)
-
-        if actor is None and 'TIFFY_PARAM_TIE_ACTOR' in os.environ:
-            actor = os.environ.get('TIFFY_PARAM_TIE_ACTOR')
-        if category is None and 'TIFFY_PARAM_TIE_CATEGORY' in os.environ:
-            category = os.environ.get('TIFFY_PARAM_TIE_CATEGORY')
-        if family is None and 'TIFFY_PARAM_TIE_FAMILY' in os.environ:
-            family = os.environ.get('TIFFY_PARAM_TIE_FAMILY')
-        if source is None and 'TIFFY_PARAM_TIE_SOURCE' in os.environ:
-            source = os.environ.get('TIFFY_PARAM_TIE_SOURCE')
 
         # check family, source, category, actor parameters
         pattern = "^[a-zA-Z0-9 /-]+(?:,[a-zA-Z0-9 /-]+)*$"
@@ -270,6 +240,7 @@ def init(category, actor, family, source, first_seen, last_seen, event_tags, out
             logging.debug("conf.base_confidence: " + str(conf.base_confidence))
             logging.debug("conf.org_uuid: " + str(conf.org_uuid))
             logging.debug("conf.org_name: " + str(conf.org_name))
+            logging.debug("log_file_path: " + str(log_file_path))
 
             TIELoader.start(output_format, conf, event_tags, category, actor, family, source, given_first_seen_date,
                             given_last_seen_date, min_confidence, min_severity, max_confidence, max_severity,

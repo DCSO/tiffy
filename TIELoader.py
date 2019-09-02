@@ -7,6 +7,7 @@ import json
 import logging
 import os
 import sys
+from pathlib import Path
 
 import requests
 from requests import HTTPError, ConnectionError, ConnectTimeout
@@ -195,7 +196,10 @@ class TIELoader:
             consoleHandler.setLevel(100)
 
         if fileLog is False:
-            fileHandler = logging.FileHandler("{0}/{1}.log".format(logPath, fileName))
+            out_path = Path(logPath)
+            if not out_path.exists():
+                out_path.mkdir()
+            fileHandler = logging.FileHandler(out_path / fileName)
             fileHandler.setFormatter(formatter)
             fileHandler.setLevel(logLvl)
             logger.addHandler(fileHandler)
