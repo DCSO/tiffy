@@ -166,7 +166,7 @@ With HTTP Basic Auth
 $ ./tiffy.py --proxy_http "http://user:pass@10.8.0.1:8000"
 ```
 
-###Disable Certificate Verification
+### Disable Certificate Verification
 
 If your Proxy is using SSL-Interception, it might be necessary to disable
 the certificate verification for requests. Use the `--disable_cert_verify` flag
