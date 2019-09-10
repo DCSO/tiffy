@@ -166,6 +166,16 @@ With HTTP Basic Auth
 $ ./tiffy.py --proxy_http "http://user:pass@10.8.0.1:8000"
 ```
 
+###Disable Certificate Verification
+
+If your Proxy is using SSL-Interception, it might be necessary to disable
+the certificate verification for requests. Use the `--disable_cert_verify` flag
+in this case.
+
+```bash
+$ ./tiffy.py --proxy_http "http://10.8.0.1:8000" --disable_cert_verify
+```
+
 ## Setting up Feed
 if tiffy ran successfully at least once, the directory `tiffy/feed` will be present. In this directory are all files needed for a MISP Feed. You need to upload these files onto a file server like nginx or apache.
 
