@@ -84,6 +84,8 @@ def get_Attribute_Type(attr):
         return 'domain'
     elif attr['data_type'] == 'URLVerbatim':
         return 'url'
+    elif attr['data_type'] == 'FileName':
+        return 'filename'
     elif attr['data_type'] == 'IPv4' or attr['data_type'] == 'IPv6':
         return 'ip-dst'
 
