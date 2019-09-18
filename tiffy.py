@@ -86,9 +86,11 @@ def signal_handler(signal_name, frame):
                    '100')
 @click.option('--proxy_http', type=str, help='Sets the address for a http based proxy e.g. http://10.8.0.1:8000')
 @click.option('--proxy_https', type=str, help='Sets the address for a https based proxy e.g. https://10.8.0.1:8000')
+@click.option('--disable_cert_verify', is_flag=True,
+              help='If set, ssl-certs will not be validated.')
 def init(category, actor, family, source, first_seen, last_seen, event_tags, output_format, no_filter, loglvl,
          disable_console_log, disable_file_log, min_severity, min_confidence, max_severity, max_confidence,
-         proxy_http, proxy_https):
+         proxy_http, proxy_https, disable_cert_verify):
     """
     Starting the converter
     """
@@ -212,7 +214,7 @@ def init(category, actor, family, source, first_seen, last_seen, event_tags, out
 
             TIELoader.start(output_format, conf, event_tags, category, actor, family, source, given_first_seen_date,
                             given_last_seen_date, min_confidence, min_severity, max_confidence, max_severity,
-                            proxy_tie_addr, no_filter)
+                            proxy_tie_addr, no_filter, disable_cert_verify)
 
         except FileNotFoundError:
             logging.error("Error: \nconfig.yml and/or tags.yml not found")
