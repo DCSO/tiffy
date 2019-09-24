@@ -235,6 +235,8 @@ def checkProxyUrls(proxy_http, proxy_https, system_proxy=True):
             url_http = urlparse(os.environ['HTTP_PROXY'])
     if proxy_https is not None:
         url_https = urlparse(proxy_https)
+    elif proxy_http is not None:
+        url_https = urlparse(proxy_http)
     elif system_proxy:
         if os.environ.get('HTTPS_PROXY'):
             url_https = urlparse(proxy_https)
@@ -259,8 +261,8 @@ def checkProxyUrls(proxy_http, proxy_https, system_proxy=True):
     if url_https is not None:
         if url_https.scheme is None or url_https.port is None or url_https.hostname is None:
             raise_error_critical(
-                'HTTPS Proxy address ist not valid. Type \'python tiffy.py --help\' for more information\'s.')
-        if url_https.scheme != 'https':
+                'HTTPS Proxy address is not valid. Type \'python tiffy.py --help\' for more information\'s.')
+        if url_https.scheme != 'https' and url_https.scheme != 'http':
             raise_error_critical('HTTPS Proxy address must have a valid scheme')
         if url_https.port <= 0:
             raise_error_critical('HTTP Proxy address must have a valid port')
