@@ -9,8 +9,9 @@
    - added flag to diasble certificate validation (needed in some proxy setups)
    
    #### Bugfixes
-   - Fixed Attributes to_ids config value not beeing used / not working
+   - Fixed Attributes to_ids config value not being used / not working
+   - Fixed Event Published config value not being used / not working
    - Fixed http proxy not being used as https proxy if no specific https proxy was given
-   - fixed https proxy parameter unnecessarily enforcing https scheme
+   - Fixed https proxy parameter unnecessarily enforcing https scheme
    
    
