@@ -16,7 +16,7 @@ def generate_MISP_Event(deduplicated_observations, conf, tags):
     event.timestamp = dt.strftime("%s")
     event['timestamp'] = dt.strftime("%s")
     event.analysis = 2
-    event.published = True
+    event.published = conf.event_published
     orgc = MISPOrganisation()
     orgc.from_json(json.dumps({'name': conf.org_name, 'uuid': conf.org_uuid}))
     event.orgc = orgc
@@ -35,7 +35,7 @@ def generate_MISP_Event(deduplicated_observations, conf, tags):
         misp_attr.type = get_Attribute_Type(attr)
         misp_attr.value = get_MISP_Fitted_Value(attr["value"], misp_attr.type)
         misp_attr.category = get_Attribute_Category(attr)
-        misp_attr.to_ids = True
+        misp_attr.to_ids = conf.attr_to_ids
         misp_attr['comment'] = 'categories: ' + str(attr['categories']) + ' actors: ' + str(attr['actors']) + \
                                ' families: ' + str(attr['families']) + ' sources: ' + str(attr['sources']) + \
                                ' severity: ' + str(attr['max_severity']) + \
@@ -63,7 +63,7 @@ def generate_Manifest_Entry(event):
 
 
 def get_Attribute_Category(attr):
-    if attr['data_type'] == 'ExactHash' or attr['data_type'] == 'EMail':
+    if attr['data_type'] == 'ExactHash' or attr['data_type'] == 'EMail' or attr['data_type'] == 'FileName':
         return 'Payload delivery'
     else:
         return 'Network activity'
@@ -84,10 +84,10 @@ def get_Attribute_Type(attr):
         return 'domain'
     elif attr['data_type'] == 'URLVerbatim':
         return 'url'
-    elif attr['data_type'] == 'FileName':
-        return 'filename'
     elif attr['data_type'] == 'IPv4' or attr['data_type'] == 'IPv6':
         return 'ip-dst'
+    elif attr['data_type'] == 'FileName':
+        return 'filename'
 
 
 def get_MISP_Fitted_Value(value, event_type):

@@ -1,7 +1,8 @@
-pytest==5.1.0
 requests==2.22.0
 pyyaml==5.1.2
 click==7.0
 pymisp==2.4.112
 python-dateutil==2.8.0
+# For tests only:
+pytest==5.1.0
 pytest-testdox==1.1.1
