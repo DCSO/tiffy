@@ -3,6 +3,7 @@ DCSO tiffy
 Copyright (c) 2019, DCSO GmbH
 """
 import logging
+import os
 
 import yaml
 
@@ -13,15 +14,11 @@ class Config:
         self.__TIE_ApiKey = ""
         self.__Org_Name = ""
         self.__Org_UUID = ""
-        self.__Event_Base_Threat_Level = ""
-        self.__Event_Published = ""
-        self.__Attr_ToIDS = ""
-        self.__Attr_Tagging = False
-        self.__URL_Categories = ""
-        self.__URL_Observations = ""
-        self.__Log_Lvl = 40
+        self.__Event_Base_Threat_Level = 3
+        self.__Event_Published = False
+        self.__Attr_ToIDS = True
         self.__Base_Confidence = 60
-        self.__Base_Severity = 3
+        self.__Base_Severity = 1
 
     # --- Getter
     @property
@@ -51,14 +48,6 @@ class Config:
     @property
     def attr_to_ids(self):
         return self.__Attr_ToIDS
-
-    @property
-    def attr_tagging(self):
-        return self.__Attr_Tagging
-
-    @property
-    def log_lvl(self):
-        return self.__Log_Lvl
 
     @property
     def base_confidence(self):
@@ -98,14 +87,6 @@ class Config:
     def attr_to_ids(self, value):
         self.__Attr_ToIDS = value
 
-    @attr_tagging.setter
-    def attr_tagging(self, value):
-        self.__Attr_Tagging = value
-
-    @log_lvl.setter
-    def log_lvl(self, value):
-        self.__Log_Lvl = value
-
     @base_confidence.setter
     def base_confidence(self, value):
         self.__Base_Confidence = value
@@ -118,67 +99,112 @@ class Config:
     def parse(configfile):
         conf = Config()
         configs = None
-        ERROR_BASE_STR = "Error parsing config.yml: "
 
         try:
             # Load Config
             config_file = open(configfile, "r", encoding="utf-8")
             configs = yaml.load(config_file, Loader=yaml.FullLoader)
-        except:
-            Config.raise_error_critical("Config file could not find. Please create a config file!")
+        except (OSError, yaml.YAMLError) as e:
+            return Config.parseFromEnv()
 
         # Config Values
         # Parsing Base Values
-        if "base" in configs:
-            base_vals = configs["base"]
+        if "TIE" in configs:
+            TIE_vals = configs["TIE"]
             # Critical Values
-            conf.tie_api_url = Config.get_config_value_critical(base_vals, "tie_apiurl")
-            conf.tie_api_key = Config.get_config_value_critical(base_vals, "tie_apikey")
+            if 'TIFFY_CONF_TIE_APIURL' in os.environ:
+                conf.tie_api_url = os.environ.get('TIFFY_CONF_TIE_APIURL')
+            else:
+                conf.tie_api_url = Config.get_config_value_critical(TIE_vals, "apiurl")
+            if 'TIFFY_CONF_TIE_APIKEY' in os.environ:
+                conf.tie_api_key = os.environ.get('TIFFY_CONF_TIE_APIKEY')
+            else:
+                conf.tie_api_key = Config.get_config_value_critical(TIE_vals, "apikey")
 
-            # Optional Values
-            conf.base_severity = Config.get_config_value_optional(base_vals, "base_severity", 1)
-            conf.base_confidence = Config.get_config_value_optional(base_vals, "base_confidence", 60)
-            # conf.log_lvl = Config.get_config_value_optional(base_vals, "log_lvl", 20)
-
-            # Addtional Checks
-            # conf.log_lvl = Config.check_integer(conf.log_lvl, 20, 0, 50)
-            conf.base_confidence = Config.check_integer(conf.base_confidence, 60, 0, 100)
-            conf.base_severity = Config.check_integer(conf.base_severity, 1, 0, 5)
         else:
-            Config.raise_error_critical("Could not find base values")
+            Config.raise_error_critical("Could not find TIE values")
 
         # Parsing Event Values
-        if "events" in configs:
-            event_vals = configs["events"]
-            # Optional Values
-            conf.event_base_thread_level = Config.get_config_value_optional(event_vals, "base_threat_level", 3)
-            conf.event_published = Config.get_config_value_optional(event_vals, "published", "False")
-        else:
-            Config.raise_error_critical("Could not find event values")
+        if "MISP" in configs:
+            MISP_vals = configs["MISP"]
+            if "events" in MISP_vals:
+                event_vals = MISP_vals["events"]
+                # Optional Values
+                if 'TIFFY_CONF_MISP_EVENTS_BASE_THREAT_LEVEL' in os.environ:
+                    conf.event_base_thread_level = int(os.environ.get('TIFFY_CONF_MISP_EVENTS_BASE_THREAT_LEVEL'))
+                else:
+                    conf.event_base_thread_level = Config.get_config_value_optional(event_vals, "base_threat_level", 3)
+                if 'TIFFY_CONF_MISP_EVENTS_PUBLISHED' in os.environ:
+                    conf.event_published = bool(os.environ.get('TIFFY_CONF_MISP_EVENTS_PUBLISHED'))
+                else:
+                    conf.event_published = Config.get_config_value_optional(event_vals, "published", "False")
+                if 'TIFFY_CONF_MISP_EVENTS_BASE_SEVERITY' in os.environ:
+                    conf.base_severity = int(os.environ.get('TIFFY_CONF_MISP_EVENTS_BASE_SEVERITY'))
+                else:
+                    conf.base_severity = Config.get_config_value_optional(event_vals, "base_severity", 1)
+                if 'TIFFY_CONF_MISP_EVENTS_BASE_CONFIDENCE' in os.environ:
+                    conf.base_confidence = int(os.environ.get('TIFFY_CONF_MISP_EVENTS_BASE_CONFIDENCE'))
+                else:
+                    conf.base_confidence = Config.get_config_value_optional(event_vals, "base_confidence", 60)
+                conf.base_confidence = Config.check_integer(conf.base_confidence, 60, 0, 100)
+                conf.base_severity = Config.check_integer(conf.base_severity, 1, 0, 5)
 
-        # Parsing Organisation Values
-        if "organisation" in configs:
-            organisation_vals = configs["organisation"]
-            # Optional Values
-            conf.org_name = Config.get_config_value_optional(organisation_vals, "name", None)
-            conf.org_uuid = Config.get_config_value_optional(organisation_vals, "uuid", None)
-        else:
-            Config.raise_error_critical("Could not find organisation values")
+            else:
+                Config.raise_error_critical("Could not find event values")
 
-        # Parsing Attribute Values
-        if "attributes" in configs:
-            attr_vals = configs["attributes"]
-            conf.attr_to_ids = Config.get_config_value_optional(attr_vals, "to_ids", "True")
-            conf.attr_tagging = Config.get_config_value_optional(attr_vals, "tagging", "True")
+            # Parsing Organisation Values
+            if "org" in MISP_vals:
+                organisation_vals = MISP_vals["org"]
+                # Optional Values
+                if 'TIFFY_CONF_MISP_ORGANISATION_NAME' in os.environ:
+                    conf.org_name = os.environ.get('TIFFY_CONF_MISP_ORGANISATION_NAME')
+                else:
+                    conf.org_name = Config.get_config_value_optional(organisation_vals, "name", None)
+                if 'TIFFY_CONF_MISP_ORGANISATION_UUID' in os.environ:
+                    conf.org_uuid = os.environ.get('TIFFY_CONF_MISP_ORGANISATION_UUID')
+                else:
+                    conf.org_uuid = Config.get_config_value_optional(organisation_vals, "uuid", None)
+            else:
+                Config.raise_error_critical("Could not find organisation values")
+
+            # Parsing Attribute Values
+            if "attributes" in MISP_vals:
+                attr_vals = MISP_vals["attributes"]
+                if 'TIFFY_CONF_MISP_ATTRIBUTES_TO_IDS' in os.environ:
+                    conf.attr_to_ids = bool(os.environ.get('TIFFY_CONF_MISP_ATTRIBUTES_TO_IDS'))
+                else:
+                    conf.attr_to_ids = Config.get_config_value_optional(attr_vals, "to_ids", "True")
+            else:
+                Config.raise_error_critical("Could not find attributes values ")
         else:
-            Config.raise_error_critical("Could not find attributes values ")
+            Config.raise_error_critical("Could not find MISP values")
 
         return conf
 
     @staticmethod
+    def parseFromEnv():
+        try:
+            config = Config()
+            config.tie_api_key = os.environ['TIFFY_CONF_TIE_APIKEY']
+            config.tie_api_url = os.environ['TIFFY_CONF_TIE_APIURL']
+            config.org_name = os.environ['TIFFY_CONF_MISP_ORGANISATION_NAME']
+            config.org_uuid = os.environ['TIFFY_CONF_MISP_ORGANISATION_UUID']
+            config.event_base_thread_level = os.environ['TIFFY_CONF_MISP_EVENTS_BASE_THREAT_LEVEL']
+            config.base_confidence = os.environ['TIFFY_CONF_MISP_EVENTS_BASE_CONFIDENCE']
+            config.base_severity = os.environ['TIFFY_CONF_MISP_EVENTS_BASE_SEVERITY']
+            config.event_published = os.environ['TIFFY_CONF_MISP_EVENTS_PUBLISHED']
+            config.attr_to_ids = os.environ['TIFFY_CONF_MISP_ATTRIBUTES_TO_IDS']
+            config.attr_tagging = os.environ['TIFFY_CONF_MISP_ATTRIBUTES_TAGGING']
+
+            return config
+        except KeyError:
+            Config.raise_error_critical(
+                "Could not find config file or fill all config values with env variables. please fill all"
+                "neccessary values or provide a config file. ")
+
+    @staticmethod
     def raise_error_critical(error_str):
         ERROR_BASE_STR = "Error parsing config.yml: "
-        logging.error(ERROR_BASE_STR + error_str)
         raise RuntimeError(ERROR_BASE_STR + error_str)
 
     @staticmethod
