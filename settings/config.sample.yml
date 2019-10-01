@@ -13,5 +13,6 @@ MISP:
     uuid: "5804adw2-12fe-1234-34av-07lk82aw012a"
   attributes:
     to_ids: False
+    to_ids_threshold: 90
 
   

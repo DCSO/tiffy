@@ -36,7 +36,7 @@ import pytest
 from click.testing import CliRunner
 
 from TIELoader import TIELoader
-from model import Config
+from model import Config, Tags
 
 
 # CTRL+C Handler --------------------------------------------------------------
@@ -127,7 +127,7 @@ def init(category, actor, family, source, first_seen, last_seen, event_tags, out
         loglvl = 'INFO'
     if log_file_path is None:
         log_file_path = sys.path[0]
-    TIELoader.init_logger(log_file_path, "tiffy.py", loglvl, disable_console_log, disable_file_log)
+    TIELoader.init_logger(log_file_path, "tiffy.py.log", loglvl, disable_console_log, disable_file_log)
     try:
 
         # Check date arguments
@@ -217,6 +217,7 @@ def init(category, actor, family, source, first_seen, last_seen, event_tags, out
         try:
             # Load config and tags
             conf = Config.parse("settings/config.yml")
+            attr_tags = Tags.parse("settings/tags.yml")
 
             logging.info("Powering up flux capacitor. Starting up tiffy.")
             logging.info("#### Start new TIE-Query ####")
@@ -244,7 +245,7 @@ def init(category, actor, family, source, first_seen, last_seen, event_tags, out
             logging.debug("conf.org_name: " + str(conf.org_name))
             logging.debug("log_file_path: " + str(log_file_path))
 
-            TIELoader.start(output_format, conf, event_tags, category, actor, family, source, given_first_seen_date,
+            TIELoader.start(output_format, conf, event_tags, attr_tags, category, actor, family, source, given_first_seen_date,
                             given_last_seen_date, min_confidence, min_severity, max_confidence, max_severity,
                             proxy_tie_addr, no_filter, disable_cert_verify)
 

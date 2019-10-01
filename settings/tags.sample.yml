@@ -1,0 +1,8 @@
+# If you don't need some tags just remove them or comment them out
+c2_tags:
+  - name: veris:action:malware:variety="C2"
+  - name: veris:confidence="High"
+  - name: tlp:amber
+malware_tags:
+  - name: veris:action:malware:variety="C2"
+  - name: veris:confidence="High"

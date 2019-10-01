@@ -17,6 +17,7 @@ class Config:
         self.__Event_Base_Threat_Level = 3
         self.__Event_Published = False
         self.__Attr_ToIDS = True
+        self.__Attr_ToIDS_threshold = 90
         self.__Base_Confidence = 60
         self.__Base_Severity = 1
 
@@ -48,6 +49,10 @@ class Config:
     @property
     def attr_to_ids(self):
         return self.__Attr_ToIDS
+
+    @property
+    def attr_to_ids_threshold(self):
+        return self.__Attr_ToIDS_threshold
 
     @property
     def base_confidence(self):
@@ -87,6 +92,10 @@ class Config:
     def attr_to_ids(self, value):
         self.__Attr_ToIDS = value
 
+    @attr_to_ids_threshold.setter
+    def attr_to_ids_threshold(self, value):
+        self.__Attr_ToIDS_threshold = value
+
     @base_confidence.setter
     def base_confidence(self, value):
         self.__Base_Confidence = value
@@ -94,6 +103,9 @@ class Config:
     @base_severity.setter
     def base_severity(self, value):
         self.__Base_Severity = value
+
+
+
 
     @staticmethod
     def parse(configfile):
@@ -174,6 +186,10 @@ class Config:
                     conf.attr_to_ids = bool(os.environ.get('TIFFY_CONF_MISP_ATTRIBUTES_TO_IDS'))
                 else:
                     conf.attr_to_ids = Config.get_config_value_optional(attr_vals, "to_ids", "True")
+                if 'TIFFY_CONF_MISP_ATTRIBUTES_TO_IDS_THRESHOLD' in os.environ:
+                    conf.attr_to_ids_threshold = int(os.environ.get('TIFFY_CONF_MISP_ATTRIBUTES_TO_IDS_THRESHOLD'))
+                else:
+                    conf.attr_to_ids_threshold = Config.get_config_value_optional(attr_vals, "to_ids_threshold", 90)
             else:
                 Config.raise_error_critical("Could not find attributes values ")
         else:
@@ -194,7 +210,7 @@ class Config:
             config.base_severity = os.environ['TIFFY_CONF_MISP_EVENTS_BASE_SEVERITY']
             config.event_published = os.environ['TIFFY_CONF_MISP_EVENTS_PUBLISHED']
             config.attr_to_ids = os.environ['TIFFY_CONF_MISP_ATTRIBUTES_TO_IDS']
-            config.attr_tagging = os.environ['TIFFY_CONF_MISP_ATTRIBUTES_TAGGING']
+            config.attr_to_ids_threshold = os.environ['TIFFY_CONF_MISP_ATTRIBUTES_TO_IDS_THRESHOLD']
 
             return config
         except KeyError:
