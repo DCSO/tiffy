@@ -6,3 +6,13 @@ c2_tags:
 malware_tags:
   - name: veris:action:malware:variety="C2"
   - name: veris:confidence="High"
+espionage_tags:
+  - name: espionage:tag
+bot_tags:
+  - name: bot:tag
+whitelist_tags:
+  - name: whitelist:tag
+cybercrime_tags:
+  - name: cybercrime:tag
+phishing_tags:
+  - name: phishing:tag
