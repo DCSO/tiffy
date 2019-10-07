@@ -18,8 +18,6 @@ class Config:
         self.__Event_Published = False
         self.__Attr_ToIDS = True
         self.__Attr_ToIDS_threshold = 90
-        self.__Base_Confidence = 60
-        self.__Base_Severity = 1
 
     # --- Getter
     @property
@@ -54,14 +52,6 @@ class Config:
     def attr_to_ids_threshold(self):
         return self.__Attr_ToIDS_threshold
 
-    @property
-    def base_confidence(self):
-        return self.__Base_Confidence
-
-    @property
-    def base_severity(self):
-        return self.__Base_Severity
-
     # --- Setter
 
     @tie_api_url.setter
@@ -95,17 +85,6 @@ class Config:
     @attr_to_ids_threshold.setter
     def attr_to_ids_threshold(self, value):
         self.__Attr_ToIDS_threshold = value
-
-    @base_confidence.setter
-    def base_confidence(self, value):
-        self.__Base_Confidence = value
-
-    @base_severity.setter
-    def base_severity(self, value):
-        self.__Base_Severity = value
-
-
-
 
     @staticmethod
     def parse(configfile):

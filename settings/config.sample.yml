@@ -6,8 +6,6 @@ MISP:
   events:
     base_threat_level: 3
     published: False
-    base_confidence: 60
-    base_severity: 1
   org:
     name: "ACME"
     uuid: "5804adw2-12fe-1234-34av-07lk82aw012a"
