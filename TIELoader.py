@@ -25,7 +25,7 @@ def get_csv_value(field, src):
 class TIELoader:
 
     @staticmethod
-    def start(out_format, conf, tags, category, actor, family, source, first_seen, last_seen, min_confidence,
+    def start(out_format, conf, tags, attr_tags, category, actor, family, source, first_seen, last_seen, min_confidence,
               min_severity, max_confindence, max_severity, proxy_tie_addr, no_filter=False, disable_cert_verify=False):
 
         # Building Auth Header
@@ -154,7 +154,7 @@ class TIELoader:
         if out_format == 'MISP':
             # Serialize event as MISP Event
 
-            event, attr_hashes = MISPHelper.generate_MISP_Event(deduplicated_observations, conf, tags)
+            event, attr_hashes = MISPHelper.generate_MISP_Event(deduplicated_observations, conf, tags, attr_tags)
             event_json = event.to_json()
             event_from_json = json.loads(event_json)
             event_from_json['publish_timestamp'] = str(event_from_json['publish_timestamp'])

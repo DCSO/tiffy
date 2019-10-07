@@ -1,5 +1,14 @@
 # tiffy Changelog
 
+### 1.0.2
+   #### Changes
+   - added threshold setting for IDS flag in config
+   - tagging for attributes derived from TIE observations added
+   - removed unused config values base_severity and base_confidence
+   
+   #### Bugfixes
+   - Fixed Bug with logging when no log_path was provided
+
 ### 1.0.1
    #### Changes
    - simplified Config File format, added possibility to use environment variables for configuration (see readme)
