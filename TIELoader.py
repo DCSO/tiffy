@@ -26,7 +26,7 @@ class TIELoader:
 
     @staticmethod
     def start(out_format, conf, tags, category, actor, family, source, first_seen, last_seen, min_confidence,
-              min_severity, max_confindence, max_severity, proxy_tie_addr, no_filter=False):
+              min_severity, max_confindence, max_severity, proxy_tie_addr, no_filter=False, disable_cert_verify=False):
 
         # Building Auth Header
         conf_authHeader = {'Authorization': 'Bearer ' + conf.tie_api_key}
@@ -79,7 +79,8 @@ class TIELoader:
         while not finished:
 
             try:
-                myResponse = requests.get(url, params=payload, headers=conf_authHeader, proxies=proxy_tie_addr)
+                myResponse = requests.get(url, params=payload, headers=conf_authHeader, proxies=proxy_tie_addr,
+                                          verify=not disable_cert_verify)
 
                 # For successful API call, response code will be 200 (OK)
                 if myResponse.ok:
@@ -144,6 +145,7 @@ class TIELoader:
             except (HTTPError, ConnectionError, ConnectTimeout) as e:
                 logging.error("Error:")
                 logging.error("TIE seems not to be available at the moment or connection is interrupted")
+                logging.debug(e)
                 connection_error = True
                 finished = True
                 return

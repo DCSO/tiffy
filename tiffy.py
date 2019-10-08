@@ -94,9 +94,11 @@ def signal_handler(signal_name, frame):
                    '100', envvar='TIFFY_PARAM_TIE_CONFIDENCE_MAX')
 @click.option('--proxy_http', type=str, help='Sets the address for a http based proxy e.g. http://10.8.0.1:8000')
 @click.option('--proxy_https', type=str, help='Sets the address for a https based proxy e.g. https://10.8.0.1:8000')
+@click.option('--disable_cert_verify', is_flag=True,
+              help='If set, ssl-certs will not be validated.')
 def init(category, actor, family, source, first_seen, last_seen, event_tags, output_format, no_filter, loglvl,
          disable_console_log, disable_file_log, log_file_path, min_severity, min_confidence, max_severity,
-         max_confidence, proxy_http, proxy_https):
+         max_confidence, proxy_http, proxy_https, disable_cert_verify):
     """
     Starting the converter
     """
@@ -244,7 +246,7 @@ def init(category, actor, family, source, first_seen, last_seen, event_tags, out
 
             TIELoader.start(output_format, conf, event_tags, category, actor, family, source, given_first_seen_date,
                             given_last_seen_date, min_confidence, min_severity, max_confidence, max_severity,
-                            proxy_tie_addr, no_filter)
+                            proxy_tie_addr, no_filter, disable_cert_verify)
 
         except FileNotFoundError:
             logging.error("Error: \nconfig.yml and/or tags.yml not found")
@@ -265,6 +267,8 @@ def checkProxyUrls(proxy_http, proxy_https, system_proxy=True):
             url_http = urlparse(os.environ['HTTP_PROXY'])
     if proxy_https is not None:
         url_https = urlparse(proxy_https)
+    elif proxy_http is not None:
+        url_https = urlparse(proxy_http)
     elif system_proxy:
         if os.environ.get('HTTPS_PROXY'):
             url_https = urlparse(proxy_https)
@@ -289,8 +293,8 @@ def checkProxyUrls(proxy_http, proxy_https, system_proxy=True):
     if url_https is not None:
         if url_https.scheme is None or url_https.port is None or url_https.hostname is None:
             raise_error_critical(
-                'HTTPS Proxy address ist not valid. Type \'python tiffy.py --help\' for more information\'s.')
-        if url_https.scheme != 'https':
+                'HTTPS Proxy address is not valid. Type \'python tiffy.py --help\' for more information\'s.')
+        if url_https.scheme != 'https' and url_https.scheme != 'http':
             raise_error_critical('HTTPS Proxy address must have a valid scheme')
         if url_https.port <= 0:
             raise_error_critical('HTTP Proxy address must have a valid port')
