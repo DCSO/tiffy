@@ -127,7 +127,7 @@ def init(category, actor, family, source, first_seen, last_seen, event_tags, out
         loglvl = 'INFO'
     if log_file_path is None:
         log_file_path = sys.path[0]
-    TIELoader.init_logger(log_file_path, "tiffy.py", loglvl, disable_console_log, disable_file_log)
+    TIELoader.init_logger(log_file_path, "tiffy.py.log", loglvl, disable_console_log, disable_file_log)
     try:
 
         # Check date arguments

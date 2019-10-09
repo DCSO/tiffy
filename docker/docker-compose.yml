@@ -24,6 +24,9 @@ services:
     restart: unless-stopped
     volumes:
     - tiffy_feed_data:/tiffy/feed
+    environment:
+    - TIFFY_PARAM_LOG_DISABLE_FILE=TRUE
+    - TIFFY_PARAM_LOG_LEVEL=INFO
     # networks:
     #   misp-backend:
   web:
