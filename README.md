@@ -26,7 +26,7 @@ $ pip3 install -r requirements.txt
 ## Configuration
 The command line client expects a configuration file in the `tiffy/settings` directory where you have to
 define the required API key and URL. To create the config file, just copy the `config.sample.yml` file to `config.yml`
-and edit it.
+and edit it. You also need to copy `tags.sample.yml` and set up any desired tags to be set. 
 
 ```bash
 $ cp settings/config.sample.yml settings/config.yml
@@ -121,6 +121,16 @@ to the base event. Double quotes need to be escaped. If no tags are passed `TLP:
 $ ./tiffy.py --event-tags {\"name\":\"tlp:amber\"}
 ```
 
+## Setting Tags for Attributes
+
+You can assign Tags to attributes using the `settings/tags.yml` file. Currently only attributes derived from TIE
+`c2-server` and `malware` observations can be tagged. Add your desired Tag to the list of tags as seen in the sample
+file. The format for a new entry is:
+
+```
+- name: tag:name:here
+```
+
 ## Setting the Output Format
 
 You can choose the output format of the feed. Currently only MISP-JSON is supported but more formats will follow.
@@ -205,6 +215,7 @@ at least the required variables.
 | TIFFY_CONF_MISP_EVENTS_BASE_SEVERITY     | 2                    |                          | IoC will get this severity if it is added                         |
 | TIFFY_CONF_MISP_EVENTS_PUBLISHED         | false                |                          | IoC will get published in MISP                                    |
 | TIFFY_CONF_MISP_ATTRIBUTES_TO_IDS        | false                |                          | Set IDS flag for this IoC                                         |
+| TIFFY_CONF_MISP_ATTRIBUTES_TO_IDS_THRESHOLD| 90                 |  90                      | Confidence Threshold at or above which attributes should get IDS flag                                        |
 | TIFFY_PARAM_TIE_SEEN_FIRST               |                      | YYYY-MM-DD               | Download only IoC which are first seen at ... and newer           |
 | TIFFY_PARAM_TIE_SEEN_LAST                |                      | YYYY-MM-DD               | Download only IoC which are last seen at ... and older            |
 | TIFFY_PARAM_TIE_ACTOR                    |                      | example1,example2        | Download only IoC with this actor                                 |

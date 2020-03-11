@@ -7,7 +7,7 @@ import uuid
 from pymisp import MISPEvent, MISPOrganisation, MISPAttribute
 
 
-def generate_MISP_Event(deduplicated_observations, conf, tags):
+def generate_MISP_Event(deduplicated_observations, conf, tags, attr_tags):
     dt = datetime.now()
 
     event = MISPEvent()
@@ -34,8 +34,25 @@ def generate_MISP_Event(deduplicated_observations, conf, tags):
         misp_attr['timestamp'] = dt.strftime("%s")
         misp_attr.type = get_Attribute_Type(attr)
         misp_attr.value = get_MISP_Fitted_Value(attr["value"], misp_attr.type)
+        if 'c2-server' in attr['categories'] and attr_tags.c2tags:
+            misp_attr['Tag'] = attr_tags.c2tags
+        if 'malware' in attr['categories'] and attr_tags.malwaretags:
+            misp_attr['Tag'] = attr_tags.malwaretags
+        if 'espionage' in attr['categories'] and attr_tags.espionagetags:
+            misp_attr['Tag'] = attr_tags.espionagetags
+        if 'bot' in attr['categories'] and attr_tags.bottags:
+            misp_attr['Tag'] = attr_tags.bottags
+        if 'whitelist' in attr['categories'] and attr_tags.whitelisttags:
+            misp_attr['Tag'] = attr_tags.whitelisttags
+        if 'cybercrime' in attr['categories'] and attr_tags.cybercrimetags:
+            misp_attr['Tag'] = attr_tags.cybercrimetags
+        if 'phishing' in attr['categories'] and attr_tags.phishingtags:
+            misp_attr['Tag'] = attr_tags.phishingtags
         misp_attr.category = get_Attribute_Category(attr)
-        misp_attr.to_ids = conf.attr_to_ids
+        if conf.attr_to_ids and attr['min_confidence'] >= conf.attr_to_ids_threshold:
+            misp_attr.to_ids = True
+        else:
+            misp_attr.to_ids = False
         misp_attr['comment'] = 'categories: ' + str(attr['categories']) + ' actors: ' + str(attr['actors']) + \
                                ' families: ' + str(attr['families']) + ' sources: ' + str(attr['sources']) + \
                                ' severity: ' + str(attr['max_severity']) + \
