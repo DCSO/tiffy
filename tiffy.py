@@ -213,11 +213,14 @@ def init(category, actor, family, source, first_seen, last_seen, event_tags, out
                     'source must be a single value or a comma delimited list of values')
 
         #### everything is fine -> start up
-        # Loading config file
+        # Loading tags file
         try:
-            # Load config and tags
-            conf = Config.parse("settings/config.yml")
             attr_tags = Tags.parse("settings/tags.yml")
+        except FileNotFoundError:
+            attr_tags = Tags()
+        try:
+            # Load config
+            conf = Config.parse("settings/config.yml")
 
             logging.info("Powering up flux capacitor. Starting up tiffy.")
             logging.info("#### Start new TIE-Query ####")
@@ -250,7 +253,7 @@ def init(category, actor, family, source, first_seen, last_seen, event_tags, out
                             proxy_tie_addr, no_filter, disable_cert_verify)
 
         except FileNotFoundError:
-            logging.error("Error: \nconfig.yml and/or tags.yml not found")
+            logging.error("Error: \nconfig.yml not found")
 
     except (RuntimeError, TypeError) as ex:
         click.echo(ex)
