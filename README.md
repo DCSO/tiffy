@@ -26,7 +26,7 @@ $ pip3 install -r requirements.txt
 ## Configuration
 The command line client expects a configuration file in the `tiffy/settings` directory where you have to
 define the required API key and URL. To create the config file, just copy the `config.sample.yml` file to `config.yml`
-and edit it.
+and edit it. You also need to copy `tags.sample.yml` and set up any desired tags to be set. 
 
 ```bash
 $ cp settings/config.sample.yml settings/config.yml
