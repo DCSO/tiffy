@@ -146,10 +146,13 @@ file. The format for a new entry is:
 
 ## Setting the Output Format
 
-You can choose the output format of the feed. Currently only MISP-JSON is supported but more formats will follow.
+You can choose the output format of the feed. Currently MISP-JSON and text files are supported but more formats will
+follow.
 
 ```bash
 $ ./tiffy.py --output-format MISP
+
+$ ./tiffy.py --output-format txt
 ```
 
 ## Disable the Default Filter

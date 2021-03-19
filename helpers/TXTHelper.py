@@ -6,7 +6,6 @@ import uuid
 
 
 def generate_TXT_File_plain(deduplicated_observations):
-    dt = datetime.now()
     txtdict = list()
 
     for key, attr in deduplicated_observations.items():
