@@ -103,3 +103,7 @@ ENV/
 /testfiles/
 .update.txt
 /update.txt
+
+#Feed files
+/feed
+/feed/*

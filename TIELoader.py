@@ -8,11 +8,12 @@ import logging
 import os
 import sys
 from pathlib import Path
+from datetime import datetime
 
 import requests
 from requests import HTTPError, ConnectionError, ConnectTimeout
 
-from helpers import fileHelper, MISPHelper, iocHelper
+from helpers import fileHelper, MISPHelper, TXTHelper, iocHelper
 
 
 def get_csv_value(field, src):
@@ -26,7 +27,7 @@ class TIELoader:
 
     @staticmethod
     def start(out_format, conf, tags, attr_tags, category, actor, family, source, first_seen, last_seen, min_confidence,
-              min_severity, max_confindence, max_severity, proxy_tie_addr, no_filter=False, disable_cert_verify=False):
+              min_severity, max_confindence, max_severity, proxy_tie_addr, data_type, no_filter=False, disable_cert_verify=False):
 
         # Building Auth Header
         conf_authHeader = {'Authorization': 'Bearer ' + conf.tie_api_key}
@@ -55,6 +56,8 @@ class TIELoader:
             payload['family'] = family
         if source:
             payload['source_pseudonym'] = source
+        if data_type:
+            payload['data_type'] = data_type
         if min_confidence and max_confindence:
             payload['confidence'] = str(min_confidence) + '-' + str(max_confindence)
         elif min_confidence:
@@ -161,9 +164,16 @@ class TIELoader:
             json_output = '{"Event" :' + json.dumps(event_from_json) + '}'
             event_no_attr = MISPHelper.generate_Manifest_Entry(event_from_json)
             manifest_output = {event['uuid']: event_no_attr}
-            fileHelper.save_events_to_file(event['uuid'], json_output)
+            fileHelper.save_events_as_json_file(event['uuid'], json_output)
             fileHelper.save_manifest_to_file(manifest_output)
             fileHelper.save_hashes(attr_hashes)
+
+        if out_format == 'txt':
+            manifest_output = TXTHelper.generate_TXT_File_plain(deduplicated_observations)
+            dt = datetime.now()
+            timestamp = datetime.timestamp(dt)
+            fileHelper.save_events_as_txt_file(timestamp, manifest_output)
+
 
     @staticmethod
     def deduplicate_observations(response_observations, deduplicated_observations):

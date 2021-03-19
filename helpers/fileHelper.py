@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 
 
-def save_events_to_file(uuid, json_output):
+def save_events_as_json_file(uuid, json_output):
     out_path = Path("feed")
     if not out_path.exists():
         out_path.mkdir()
@@ -13,6 +13,18 @@ def save_events_to_file(uuid, json_output):
     logging.info("Saved attributes as JSON-File: " + str(outfile))
     with outfile.open("w") as text_file:
         text_file.write(json_output)
+
+
+def save_events_as_txt_file(date, txt_output):
+    out_path = Path("feed")
+    if not out_path.exists():
+        out_path.mkdir()
+    filename = str(date) + ".txt"
+    outfile = out_path / filename
+    logging.info("Saved attributes as txt-File: " + str(outfile))
+    with outfile.open("w") as text_file:
+        for item in txt_output:
+            text_file.write("%s\n" % item)
 
 
 def save_manifest_to_file(manifest_output):
