@@ -112,6 +112,19 @@ $ ./tiffy.py --max-confidence 4                        #gets all ioc's up to and
 $ ./tiffy.py --min-confidence 2 --max-confidence 4     #gets all ioc's from confidence 2 to confidence 4
 ```
 
+## Query specific data types
+
+You can specify the data type to be queried by TIE. This is useful, for example, if you use the txt output parameter to
+create specific files that contain only domains, URL, and so on.
+
+```bash
+$ ./tiffy.py --data-type urlverbatim
+
+$ ./tiffy.py --data-type urlverbatim,domainname
+
+$ ./tiffy.py --data-type urlverbatim  --output-format txt
+```
+
 ## Setting Default Tags for the MISP Event
 
 You can pass tags for the newly created event. Tags are passed as MISP-compatible JSON Strings and will be added 
