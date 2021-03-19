@@ -1,5 +1,11 @@
 # tiffy Changelog
 
+### 1.0.4
+    #### Changes
+    - added support for TIE data types
+    - added support to create txt files
+    - added gitignore entry to ignore existing feed files
+
 ### 1.0.2
    #### Changes
    - added threshold setting for IDS flag in config

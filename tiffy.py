@@ -61,7 +61,7 @@ def signal_handler(signal_name, frame):
 @click.option('--last-seen', envvar='TIFFY_PARAM_TIE_SEEN_LAST')
 @click.option('--event-tags', help='event base tags as MISP conform JSON object String',
               default='{"name": "tlp:amber"}', envvar='TIFFY_PARAM_TIE_MISP_EVENT_TAGS')
-@click.option('--output-format', type=click.Choice(['MISP']), default='MISP',
+@click.option('--output-format', type=click.Choice(['MISP', "txt"]), default='MISP',
               help='sets the output format for the feed.', envvar='TIFFY_PARAM_OUTPUT_FORMAT')
 @click.option('--no-filter', is_flag=True,
               help='If set, no filter will be used for the request to TIE. Otherwise, the default filter will be used.',
@@ -92,13 +92,14 @@ def signal_handler(signal_name, frame):
                    'fetched. If used, the generator will ignore the severity value defined '
                    'in the config file. The confidence value can be equal or between 0 and '
                    '100', envvar='TIFFY_PARAM_TIE_CONFIDENCE_MAX')
+@click.option('--data-type', help='list of data types supported by TIE separated by comma')
 @click.option('--proxy_http', type=str, help='Sets the address for a http based proxy e.g. http://10.8.0.1:8000')
 @click.option('--proxy_https', type=str, help='Sets the address for a https based proxy e.g. https://10.8.0.1:8000')
 @click.option('--disable_cert_verify', is_flag=True,
               help='If set, ssl-certs will not be validated.')
 def init(category, actor, family, source, first_seen, last_seen, event_tags, output_format, no_filter, loglvl,
          disable_console_log, disable_file_log, log_file_path, min_severity, min_confidence, max_severity,
-         max_confidence, proxy_http, proxy_https, disable_cert_verify):
+         max_confidence, data_type, proxy_http, proxy_https, disable_cert_verify):
     """
     Starting the converter
     """
@@ -250,7 +251,7 @@ def init(category, actor, family, source, first_seen, last_seen, event_tags, out
 
             TIELoader.start(output_format, conf, event_tags, attr_tags, category, actor, family, source, given_first_seen_date,
                             given_last_seen_date, min_confidence, min_severity, max_confidence, max_severity,
-                            proxy_tie_addr, no_filter, disable_cert_verify)
+                            proxy_tie_addr, data_type, no_filter, disable_cert_verify)
 
         except FileNotFoundError:
             logging.error("Error: \nconfig.yml not found")
