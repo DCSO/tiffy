@@ -1,0 +1,43 @@
+version: '3'
+
+### Networks ###
+# networks: 
+#   misp-backend:
+#     driver: bridge
+#     driver_opts:
+#      com.docker.network.bridge.name: "mispbr0"
+#      com.docker.network.enable_ipv6: "false"
+#     ipam:
+#       config:
+#       - subnet: "192.168.47.0/28"
+
+### Volumes ###
+volumes:
+  tiffy_feed_data:
+
+### Services ###
+services:
+  ### TIFFY ###
+  tiffy:
+    image: dcso/tiffy
+    container_name: tiffy
+    restart: unless-stopped
+    volumes:
+    - tiffy_feed_data:/tiffy/feed
+    environment:
+    - TIFFY_PARAM_LOG_DISABLE_FILE=TRUE
+    - TIFFY_PARAM_LOG_LEVEL=INFO
+    # networks:
+    #   misp-backend:
+  web:
+    image: nginx:alpine
+    container_name: tiffy_web
+    restart: unless-stopped
+    ports:
+    - 8001:80
+    volumes:
+    - tiffy_feed_data:/usr/share/nginx/tiffy
+    - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    # networks:
+    #   misp-backend:
+
